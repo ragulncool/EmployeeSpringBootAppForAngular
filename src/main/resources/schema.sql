@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS employee (
+    emp_id INTEGER PRIMARY KEY,
+    emp_name VARCHAR(200) NOT NULL,
+    emp_dept VARCHAR(200) NOT NULL
+);
