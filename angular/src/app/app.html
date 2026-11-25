@@ -1,0 +1,48 @@
+<div class="page-shell">
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="PeopleDesk home">
+      <span class="brand-mark">P</span>
+      <span>PeopleDesk</span>
+    </a>
+    <span class="api-status"><span class="status-dot"></span> Employee API</span>
+  </header>
+
+  <main class="content">
+    <section class="intro">
+      <div>
+        <p class="eyebrow">PEOPLE OPERATIONS</p>
+        <h1>Employee directory</h1>
+        <p class="subtitle">Manage your team, all in one place.</p>
+      </div>
+      <div class="team-count">
+        <span>{{ employees().length }}</span>
+        <small>team members</small>
+      </div>
+    </section>
+
+    @if (error()) {
+      <div class="notice error" role="alert">
+        <span>{{ error() }}</span>
+        <button class="notice-close" type="button" aria-label="Dismiss error" (click)="error.set('')">×</button>
+      </div>
+    }
+
+    <section class="workspace">
+      <app-employee-form
+        [employee]="selectedEmployee()"
+        [saving]="saving()"
+        (submitted)="saveEmployee($event)"
+        (cancelled)="cancelEdit()"
+      />
+      <app-employee-list
+        [employees]="employees()"
+        [loading]="loading()"
+        [deletingId]="deletingId()"
+        (refresh)="loadEmployees()"
+        (edit)="editEmployee($event)"
+        (delete)="deleteEmployee($event)"
+      />
+    </section>
+    <footer>PEOPLEDESK <span>·</span> SPRING BOOT + ANGULAR</footer>
+  </main>
+</div>

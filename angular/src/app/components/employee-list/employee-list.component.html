@@ -1,0 +1,66 @@
+<section class="directory-panel">
+  <div class="directory-heading">
+    <div>
+      <h2>Your team</h2>
+      <p>Employee records from your H2 database</p>
+    </div>
+    <button class="refresh-button" type="button" (click)="refresh.emit()" [disabled]="loading">
+      <span [class.spinning]="loading">↻</span> Refresh
+    </button>
+  </div>
+
+  @if (loading) {
+    <div class="empty-state"><span class="loader"></span><p>Loading your team…</p></div>
+  } @else if (employees.length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">◎</div>
+      <h3>No employees yet</h3>
+      <p>Add your first team member using the form.</p>
+    </div>
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>EMPLOYEE</th>
+            <th>DEPARTMENT</th>
+            <th class="actions-heading">ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (employee of employees; track employee.emp_id) {
+            <tr>
+              <td>
+                <div class="employee-cell">
+                  <span class="avatar" [attr.data-tone]="employee.emp_id % 5">
+                    {{ initials(employee.emp_name) }}
+                  </span>
+                  <span class="employee-name">
+                    <strong>{{ employee.emp_name }}</strong>
+                    <small>ID {{ employee.emp_id }}</small>
+                  </span>
+                </div>
+              </td>
+              <td><span class="department-pill">{{ employee.emp_dept }}</span></td>
+              <td>
+                <div class="row-actions">
+                  <button class="icon-button edit-action" type="button" title="Edit employee" (click)="edit.emit(employee)">Edit</button>
+                  <button
+                    class="icon-button delete-action"
+                    type="button"
+                    title="Delete employee"
+                    [disabled]="deletingId === employee.emp_id"
+                    (click)="delete.emit(employee)"
+                  >
+                    {{ deletingId === employee.emp_id ? '…' : 'Delete' }}
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="table-footer">Showing {{ employees.length }} employee{{ employees.length === 1 ? '' : 's' }}</div>
+  }
+</section>

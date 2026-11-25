@@ -1,0 +1,52 @@
+<aside class="form-panel">
+  <div class="panel-heading">
+    <div class="heading-icon">{{ employee ? '✎' : '+' }}</div>
+    <div>
+      <h2>{{ employee ? 'Edit employee' : 'Add employee' }}</h2>
+      <p>{{ employee ? 'Update team member details' : 'Add someone new to your team' }}</p>
+    </div>
+  </div>
+
+  <form (ngSubmit)="submitForm()" #employeeForm="ngForm">
+    <label for="emp-id">Employee ID</label>
+    <input
+      id="emp-id"
+      name="emp_id"
+      type="number"
+      min="1"
+      placeholder="e.g. 1005"
+      required
+      [(ngModel)]="form.emp_id"
+      [disabled]="!!employee"
+    />
+
+    <label for="emp-name">Full name</label>
+    <input
+      id="emp-name"
+      name="emp_name"
+      type="text"
+      maxlength="200"
+      placeholder="e.g. Jordan Lee"
+      required
+      [(ngModel)]="form.emp_name"
+    />
+
+    <label for="emp-dept">Department</label>
+    <input
+      id="emp-dept"
+      name="emp_dept"
+      type="text"
+      maxlength="200"
+      placeholder="e.g. Engineering"
+      required
+      [(ngModel)]="form.emp_dept"
+    />
+
+    <button class="primary-button" type="submit" [disabled]="employeeForm.invalid || saving">
+      {{ saving ? 'Saving…' : employee ? 'Save changes' : 'Add employee' }}
+    </button>
+    @if (employee) {
+      <button class="cancel-button" type="button" (click)="cancelled.emit()">Cancel</button>
+    }
+  </form>
+</aside>
