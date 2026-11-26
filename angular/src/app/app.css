@@ -51,6 +51,29 @@
   font-weight: 600;
 }
 
+.account-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.logout-button {
+  padding: 8px 12px;
+  border: 1px solid #e1e5ef;
+  border-radius: 8px;
+  background: white;
+  color: #53617b;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.logout-button:hover {
+  border-color: #bac3d5;
+  color: #283650;
+}
+
 .status-dot {
   width: 8px;
   height: 8px;
@@ -63,6 +86,89 @@
   width: min(1120px, calc(100% - 48px));
   margin: 0 auto;
   padding: 54px 0 28px;
+}
+
+.auth-panel {
+  width: min(100%, 430px);
+  margin: 35px auto 0;
+  padding: 34px;
+  border: 1px solid #e7e9f1;
+  border-radius: 16px;
+  background: white;
+  box-shadow: 0 12px 40px rgba(37, 49, 76, 0.06);
+}
+
+.auth-panel h1 {
+  font-size: 30px;
+}
+
+.auth-panel .notice {
+  margin-top: 20px;
+}
+
+.auth-form {
+  display: grid;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.auth-form label {
+  margin-top: 8px;
+  color: #53617b;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.auth-form input {
+  width: 100%;
+  padding: 12px 13px;
+  border: 1px solid #dfe3ec;
+  border-radius: 9px;
+  outline: none;
+  color: #25314c;
+  font: inherit;
+  font-size: 14px;
+}
+
+.auth-form input:focus {
+  border-color: #6574da;
+  box-shadow: 0 0 0 3px rgba(101, 116, 218, 0.12);
+}
+
+.primary-button {
+  width: 100%;
+  margin-top: 13px;
+  padding: 12px;
+  border: 0;
+  border-radius: 9px;
+  background: #4f62d8;
+  color: white;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.primary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.auth-switch {
+  margin: 23px 0 0;
+  color: #8490a5;
+  font-size: 13px;
+  text-align: center;
+}
+
+.auth-switch button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #4f62d8;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
 }
 
 .intro {
@@ -179,6 +285,15 @@ footer span {
   .topbar {
     height: 62px;
     padding: 0 17px;
+  }
+
+  .account-actions {
+    gap: 10px;
+  }
+
+  .auth-panel {
+    margin-top: 10px;
+    padding: 25px 20px;
   }
 
   .content {

@@ -1,18 +1,27 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { EmployeeFormComponent } from './components/employee-form/employee-form.component';
 import { EmployeeListComponent } from './components/employee-list/employee-list.component';
 import { Employee } from './models/employee';
+import { AuthService, Credentials } from './services/auth.service';
 import { EmployeeService } from './services/employee.service';
 
 @Component({
-  imports: [EmployeeFormComponent, EmployeeListComponent],
+  imports: [FormsModule, EmployeeFormComponent, EmployeeListComponent],
   selector: 'app-root',
   styleUrl: './app.css',
   templateUrl: './app.html',
 })
 export class App implements OnInit {
+  private readonly authService = inject(AuthService);
   private readonly employeeService = inject(EmployeeService);
 
+  protected readonly isAuthenticated = this.authService.isAuthenticated;
+  protected readonly authMode = signal<'login' | 'signup'>('login');
+  protected readonly authBusy = signal(false);
+  protected readonly authError = signal('');
+  protected credentials: Credentials = { username: '', password: '' };
   protected readonly employees = signal<Employee[]>([]);
   protected readonly loading = signal(false);
   protected readonly saving = signal(false);
@@ -21,7 +30,47 @@ export class App implements OnInit {
   protected readonly selectedEmployee = signal<Employee | null>(null);
 
   ngOnInit(): void {
-    this.loadEmployees();
+    if (this.isAuthenticated()) {
+      this.loadEmployees();
+    }
+  }
+
+  protected submitAuth(): void {
+    this.authBusy.set(true);
+    this.authError.set('');
+    const request = this.authMode() === 'signup'
+      ? this.authService.signup(this.credentials)
+      : this.authService.login(this.credentials);
+
+    request.subscribe({
+      next: () => {
+        this.authBusy.set(false);
+        this.loadEmployees();
+      },
+      error: (error: HttpErrorResponse) => {
+        this.authError.set(
+          error.status === 401
+            ? 'Invalid username or password.'
+            : error.status === 409
+              ? 'That username is already registered.'
+              : error.status === 400
+                ? 'Choose a username (3-64 letters, numbers, dots, underscores, or hyphens) and a password of at least 8 characters.'
+                : 'Could not connect to the authentication service. Try again.',
+        );
+        this.authBusy.set(false);
+      },
+    });
+  }
+
+  protected switchAuthMode(): void {
+    this.authMode.update((mode) => mode === 'login' ? 'signup' : 'login');
+    this.authError.set('');
+  }
+
+  protected logout(): void {
+    this.authService.logout().subscribe({
+      error: () => this.authError.set('You have been signed out, but the server could not revoke the token.'),
+    });
   }
 
   protected loadEmployees(): void {

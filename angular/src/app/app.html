@@ -4,45 +4,102 @@
       <span class="brand-mark">P</span>
       <span>PeopleDesk</span>
     </a>
-    <span class="api-status"><span class="status-dot"></span> Employee API</span>
+    @if (isAuthenticated()) {
+      <div class="account-actions">
+        <span class="api-status"><span class="status-dot"></span> Employee API</span>
+        <button class="logout-button" type="button" (click)="logout()">Log out</button>
+      </div>
+    }
   </header>
 
   <main class="content">
-    <section class="intro">
-      <div>
+    @if (isAuthenticated()) {
+      <section class="intro">
+        <div>
+          <p class="eyebrow">PEOPLE OPERATIONS</p>
+          <h1>Employee directory</h1>
+          <p class="subtitle">Manage your team, all in one place.</p>
+        </div>
+        <div class="team-count">
+          <span>{{ employees().length }}</span>
+          <small>team members</small>
+        </div>
+      </section>
+
+      @if (error()) {
+        <div class="notice error" role="alert">
+          <span>{{ error() }}</span>
+          <button class="notice-close" type="button" aria-label="Dismiss error" (click)="error.set('')">×</button>
+        </div>
+      }
+
+      <section class="workspace">
+        <app-employee-form
+          [employee]="selectedEmployee()"
+          [saving]="saving()"
+          (submitted)="saveEmployee($event)"
+          (cancelled)="cancelEdit()"
+        />
+        <app-employee-list
+          [employees]="employees()"
+          [loading]="loading()"
+          [deletingId]="deletingId()"
+          (refresh)="loadEmployees()"
+          (edit)="editEmployee($event)"
+          (delete)="deleteEmployee($event)"
+        />
+      </section>
+      <footer>PEOPLEDESK <span>·</span> SPRING BOOT + ANGULAR</footer>
+    } @else {
+      <section class="auth-panel">
         <p class="eyebrow">PEOPLE OPERATIONS</p>
-        <h1>Employee directory</h1>
-        <p class="subtitle">Manage your team, all in one place.</p>
-      </div>
-      <div class="team-count">
-        <span>{{ employees().length }}</span>
-        <small>team members</small>
-      </div>
-    </section>
+        <h1>{{ authMode() === 'login' ? 'Welcome back' : 'Create your account' }}</h1>
+        <p class="subtitle">
+          {{ authMode() === 'login' ? 'Log in to manage your employee directory.' : 'Sign up to get started with PeopleDesk.' }}
+        </p>
 
-    @if (error()) {
-      <div class="notice error" role="alert">
-        <span>{{ error() }}</span>
-        <button class="notice-close" type="button" aria-label="Dismiss error" (click)="error.set('')">×</button>
-      </div>
+        @if (authError()) {
+          <div class="notice error" role="alert">{{ authError() }}</div>
+        }
+
+        <form class="auth-form" (ngSubmit)="submitAuth()" #authForm="ngForm">
+          <label for="username">Username</label>
+          <input
+            id="username"
+            name="username"
+            type="text"
+            autocomplete="username"
+            minlength="3"
+            maxlength="64"
+            required
+            [(ngModel)]="credentials.username"
+          />
+
+          <label for="password">Password</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            [autocomplete]="authMode() === 'login' ? 'current-password' : 'new-password'"
+            minlength="8"
+            maxlength="72"
+            required
+            [(ngModel)]="credentials.password"
+          />
+
+          <button class="primary-button" type="submit" [disabled]="authForm.invalid || authBusy()">
+            {{ authBusy() ? 'Please wait…' : authMode() === 'login' ? 'Log in' : 'Create account' }}
+          </button>
+        </form>
+
+        <p class="auth-switch">
+          {{ authMode() === 'login' ? 'New to PeopleDesk?' : 'Already have an account?' }}
+          <button type="button" (click)="switchAuthMode()">
+            {{ authMode() === 'login' ? 'Sign up' : 'Log in' }}
+          </button>
+        </p>
+      </section>
+      <footer>PEOPLEDESK <span>·</span> SPRING BOOT + ANGULAR</footer>
     }
-
-    <section class="workspace">
-      <app-employee-form
-        [employee]="selectedEmployee()"
-        [saving]="saving()"
-        (submitted)="saveEmployee($event)"
-        (cancelled)="cancelEdit()"
-      />
-      <app-employee-list
-        [employees]="employees()"
-        [loading]="loading()"
-        [deletingId]="deletingId()"
-        (refresh)="loadEmployees()"
-        (edit)="editEmployee($event)"
-        (delete)="deleteEmployee($event)"
-      />
-    </section>
-    <footer>PEOPLEDESK <span>·</span> SPRING BOOT + ANGULAR</footer>
   </main>
 </div>
