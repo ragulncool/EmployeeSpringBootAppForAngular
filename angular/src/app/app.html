@@ -21,7 +21,7 @@
           <p class="subtitle">Manage your team, all in one place.</p>
         </div>
         <div class="team-count">
-          <span>{{ employees().length }}</span>
+          <span>{{ totalElements() }}</span>
           <small>team members</small>
         </div>
       </section>
@@ -44,9 +44,18 @@
           [employees]="employees()"
           [loading]="loading()"
           [deletingId]="deletingId()"
+          [page]="page()"
+          [size]="size()"
+          [totalElements]="totalElements()"
+          [totalPages]="totalPages()"
+          [sortBy]="sortBy()"
+          [direction]="direction()"
           (refresh)="loadEmployees()"
           (edit)="editEmployee($event)"
           (delete)="deleteEmployee($event)"
+          (pageChange)="changePage($event)"
+          (sizeChange)="changePageSize($event)"
+          (sortChange)="changeSort($event)"
         />
       </section>
       <footer>PEOPLEDESK <span>·</span> SPRING BOOT + ANGULAR</footer>

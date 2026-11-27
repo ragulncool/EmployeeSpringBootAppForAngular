@@ -141,6 +141,52 @@ class SpringappApplicationTests {
 				.andExpect(status().isNotFound());
 	}
 
+	@Test
+	void paginatesAndSortsEmployeeRecords() throws Exception {
+		String token = signupAndGetToken();
+
+		mockMvc.perform(get("/api/employees")
+						.header("Authorization", "Bearer " + token)
+						.param("page", "0")
+						.param("size", "10")
+						.param("sortBy", "emp_id")
+						.param("direction", "asc"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.content.length()").value(10))
+				.andExpect(jsonPath("$.page").value(0))
+				.andExpect(jsonPath("$.size").value(10))
+				.andExpect(jsonPath("$.totalElements").value(org.hamcrest.Matchers.greaterThanOrEqualTo(35)))
+				.andExpect(jsonPath("$.totalPages").value(org.hamcrest.Matchers.greaterThanOrEqualTo(4)));
+
+		MvcResult sortedResult = mockMvc.perform(get("/api/employees")
+						.header("Authorization", "Bearer " + token)
+						.param("page", "0")
+						.param("size", "100")
+						.param("sortBy", "emp_id")
+						.param("direction", "desc"))
+				.andExpect(status().isOk())
+				.andReturn();
+		java.util.List<Integer> ids = com.jayway.jsonpath.JsonPath.read(
+				sortedResult.getResponse().getContentAsString(), "$.content[*].emp_id");
+		org.junit.jupiter.api.Assertions.assertTrue(ids.get(0) > ids.get(1));
+
+		mockMvc.perform(get("/api/employees")
+						.header("Authorization", "Bearer " + token)
+						.param("page", "0")
+						.param("size", "101")
+						.param("sortBy", "emp_id")
+						.param("direction", "asc"))
+				.andExpect(status().isBadRequest());
+
+		mockMvc.perform(get("/api/employees")
+						.header("Authorization", "Bearer " + token)
+						.param("page", "0")
+						.param("size", "10")
+						.param("sortBy", "emp_id; DROP TABLE employee")
+						.param("direction", "asc"))
+				.andExpect(status().isBadRequest());
+	}
+
 	private String signupAndGetToken() throws Exception {
 		MvcResult result = mockMvc.perform(post("/api/auth/signup")
 						.contentType(MediaType.APPLICATION_JSON)

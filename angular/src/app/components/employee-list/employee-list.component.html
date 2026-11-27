@@ -9,6 +9,34 @@
     </button>
   </div>
 
+  <div class="table-controls">
+    <label>
+      Sort by
+      <select [value]="sortBy" (change)="changeSortBy($event)">
+        <option value="emp_id">Employee ID</option>
+        <option value="emp_name">Name</option>
+        <option value="emp_dept">Department</option>
+      </select>
+    </label>
+    <label>
+      Direction
+      <select [value]="direction" (change)="changeDirection($event)">
+        <option value="asc">Ascending</option>
+        <option value="desc">Descending</option>
+      </select>
+    </label>
+    <label>
+      Rows per page
+      <select [value]="size" (change)="changeSize($event)">
+        <option [value]="10">10</option>
+        <option [value]="20">20</option>
+        <option [value]="30">30</option>
+        <option [value]="50">50</option>
+        <option [value]="100">100</option>
+      </select>
+    </label>
+  </div>
+
   @if (loading) {
     <div class="empty-state"><span class="loader"></span><p>Loading your team…</p></div>
   } @else if (employees.length === 0) {
@@ -61,6 +89,13 @@
         </tbody>
       </table>
     </div>
-    <div class="table-footer">Showing {{ employees.length }} employee{{ employees.length === 1 ? '' : 's' }}</div>
+    <div class="table-footer">
+      <span>Showing {{ firstVisible }}–{{ lastVisible }} of {{ totalElements }} employees</span>
+      <div class="pagination-actions">
+        <span>Page {{ totalPages === 0 ? 0 : page + 1 }} of {{ totalPages }}</span>
+        <button type="button" [disabled]="loading || page === 0" (click)="pageChange.emit(page - 1)">Previous</button>
+        <button type="button" [disabled]="loading || page + 1 >= totalPages" (click)="pageChange.emit(page + 1)">Next</button>
+      </div>
+    </div>
   }
 </section>

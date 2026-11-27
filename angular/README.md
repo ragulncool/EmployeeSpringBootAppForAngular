@@ -28,12 +28,17 @@ The local server serves the Angular build and proxies `/api/*` requests to `http
 
 The UI lists, creates, edits, and deletes employees using:
 
-- `GET /api/employees` and `GET /api/employees/{empId}`
+- `GET /api/employees?page=0&size=10&sortBy=emp_id&direction=asc`
+- `GET /api/employees/{empId}`
 - `POST /api/employees`
 - `PUT /api/employees/{empId}`
 - `DELETE /api/employees/{empId}`
 
+The employee list endpoint returns a page object containing `content`, `page`, `size`, `totalElements`, `totalPages`, `sortBy`, and `direction`. Page numbers are zero-based, page size is limited to 1–100, and sorting supports `emp_id`, `emp_name`, or `emp_dept` with `asc` or `desc` direction. The UI sends all four query parameters and lets users change page, page size, and sorting.
+
 Employee JSON fields are `emp_id`, `emp_name`, and `emp_dept`.
+
+The database initializer adds 35 demo employees (IDs 90001–90035) only when those IDs are not already present, so the UI has multiple pages to explore.
 
 ## Authentication
 

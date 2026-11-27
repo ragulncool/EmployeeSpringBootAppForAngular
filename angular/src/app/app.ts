@@ -5,7 +5,7 @@ import { EmployeeFormComponent } from './components/employee-form/employee-form.
 import { EmployeeListComponent } from './components/employee-list/employee-list.component';
 import { Employee } from './models/employee';
 import { AuthService, Credentials } from './services/auth.service';
-import { EmployeeService } from './services/employee.service';
+import { EmployeePage, EmployeeQuery, EmployeeService } from './services/employee.service';
 
 @Component({
   imports: [FormsModule, EmployeeFormComponent, EmployeeListComponent],
@@ -23,6 +23,12 @@ export class App implements OnInit {
   protected readonly authError = signal('');
   protected credentials: Credentials = { username: '', password: '' };
   protected readonly employees = signal<Employee[]>([]);
+  protected readonly page = signal(0);
+  protected readonly size = signal(10);
+  protected readonly totalElements = signal(0);
+  protected readonly totalPages = signal(0);
+  protected readonly sortBy = signal<EmployeeQuery['sortBy']>('emp_id');
+  protected readonly direction = signal<EmployeeQuery['direction']>('asc');
   protected readonly loading = signal(false);
   protected readonly saving = signal(false);
   protected readonly deletingId = signal<number | null>(null);
@@ -76,9 +82,22 @@ export class App implements OnInit {
   protected loadEmployees(): void {
     this.loading.set(true);
     this.error.set('');
-    this.employeeService.getAll().subscribe({
-      next: (employees) => {
-        this.employees.set(employees);
+    this.employeeService.getAll({
+      page: this.page(),
+      size: this.size(),
+      sortBy: this.sortBy(),
+      direction: this.direction(),
+    }).subscribe({
+      next: (result: EmployeePage) => {
+        const lastPage = Math.max(result.totalPages - 1, 0);
+        if (this.page() > lastPage) {
+          this.page.set(lastPage);
+          this.loadEmployees();
+          return;
+        }
+        this.employees.set(result.content);
+        this.totalElements.set(result.totalElements);
+        this.totalPages.set(result.totalPages);
         this.loading.set(false);
       },
       error: () => {
@@ -86,6 +105,24 @@ export class App implements OnInit {
         this.loading.set(false);
       },
     });
+  }
+
+  protected changePage(page: number): void {
+    this.page.set(page);
+    this.loadEmployees();
+  }
+
+  protected changePageSize(size: number): void {
+    this.size.set(size);
+    this.page.set(0);
+    this.loadEmployees();
+  }
+
+  protected changeSort(sort: { sortBy: EmployeeQuery['sortBy']; direction: EmployeeQuery['direction'] }): void {
+    this.sortBy.set(sort.sortBy);
+    this.direction.set(sort.direction);
+    this.page.set(0);
+    this.loadEmployees();
   }
 
   protected saveEmployee(employee: Employee): void {
